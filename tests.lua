@@ -1,4 +1,12 @@
-tests = {}
+local require = require
+local setfenv = setfenv
+or require"compat_env".setfenv -- see https://github.com/davidm/lua-compat-env
+pcall( require, "gro" ) -- see https://github.com/tst2005/lua-gro
+
+local assert = assert
+local print = print
+local common
+local tests = {}
 
 tests["Existence of common.class"] = function()
 	assert(common.class, "common.class is not exported!")
@@ -67,7 +75,7 @@ tests["Self-test"] = function()
 end
 
 --log it all to the terminal
-function log(type, ...)
+local function log(type, ...)
 	local args = {...}
 	if type == "implementation" then
 		print("Testing implementation: " .. args[1])
@@ -89,12 +97,11 @@ function log(type, ...)
 end
 
 --run all tests on an implementation
-function run(implementation)
+local function run(implementation)
 	log("implementation", implementation)
-	--make sure we load the api
-	_G.common_class = true
 	--load the implementation
-	require(implementation)
+	common = require(implementation)
+	--assert(type(common) == "table" and common.class and common.instance)
 	--count the attempts
 	local failed = 0
 	local attempts = 0
